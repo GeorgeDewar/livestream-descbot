@@ -1,7 +1,16 @@
 import dotenv from 'dotenv';
 import OpenAI from "openai";
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone.js';
+
 import { youtube } from './youtube.js';
+import {truncate} from './util.js'
+import {prompt} from './content.js'
+
 dotenv.config()
+dayjs.extend(timezone);
+dayjs.tz.setDefault("Pacific/Auckland");
+console.log(`Current time is ${dayjs().format('DD/MM/YYYY HH:mm:ss Z')}\n`);
 
 async function main() {
   // Get live broadcasts
@@ -20,8 +29,11 @@ async function main() {
   const description = broadcast.snippet.description;
 
   console.log(`Found broadcast ${broadcast.id}`);
-  console.log('Current Title:', title);
-  console.log('Current Description:', description);
+  console.log('Title:', title);
+  console.log('Published at:', broadcast.snippet.publishedAt);
+  console.log('Description:', truncate(description.replaceAll('\n', ' '), 100));
+  console.log('');
+  //console.log(broadcast);
 
   // Get the captions for the broadcast
   console.log('Looking for captions...');
@@ -39,20 +51,45 @@ async function main() {
   console.log('Downloading captions...');
   const captionData = await youtube.captions.download({
     id: servingCaptions.id,
-    tfmt: 'sbv'
+    tfmt: 'srt'
   }, {responseType: 'text'});
   console.log(`✅ Captions downloaded successfully - length: ${captionData.data.length} characters`);
 
-  const transcription = captionData.data;
-  
+  const formattedDate = dayjs(broadcast.snippet.publishedAt).format('DD/MM/YYYY');
+  const newTitle = `Sunday Morning Worship - ${formattedDate}`;
+  console.log('New title:', newTitle);
+
+  const transcription = captionData.data.replace(/^\d+$/gm, '').replace(/\n\n/g, '\n').trim();
+  //console.log(transcription);
+  const client = new OpenAI();
+
+  console.log('Generating chapter markers using AI...');
+  const response = await client.responses.create({
+    model: "gpt-5.2",
+    input: prompt + transcription,
+  });
+  console.log('✅ Chapter markers generated successfully:');
+  console.log(response.output_text);
+
+  const newDescription = `Welcome to our Sunday Morning worship service on ${formattedDate}.\n\n${response.output_text}\n\nPlease note: The timestamp descriptions above are automatically generated and may not always be accurate.`
+  console.log('New description:', newDescription);
+
+  console.log('Updating broadcast details on YouTube...');
+  await youtube.liveBroadcasts.update({
+    part: 'snippet',
+    requestBody: {
+      id: broadcast.id,
+      snippet: {
+        ...broadcast.snippet,
+        title: newTitle,
+        description: newDescription
+      }
+    }
+  });
+  console.log('✅ Broadcast updated successfully');
+
+  console.log('Check the video here: https://www.youtube.com/watch?v=' + broadcast.id);
 }
 
 main();
-// const client = new OpenAI();
 
-// const response = await client.responses.create({
-//   model: "gpt-5.2",
-//   input: "Write a short bedtime story about a unicorn.",
-// });
-
-// console.log(response.output_text);
