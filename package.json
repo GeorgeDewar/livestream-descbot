@@ -1,0 +1,14 @@
+{
+  "name": "livestream-descbot",
+  "version": "1.0.0",
+  "description": "Add a description with chapter markers to live-streamed videos",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "openai": "^6.16.0"
+  }
+}
