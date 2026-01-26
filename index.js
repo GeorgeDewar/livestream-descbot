@@ -36,6 +36,7 @@ async function main() {
   //console.log(broadcast);
 
   // Get the captions for the broadcast
+  // First, list the caption tracks
   console.log('Looking for captions...');
   const captions = await youtube.captions.list({
     part: 'snippet',
@@ -48,6 +49,7 @@ async function main() {
   }
   console.log(`✅ Found ${servingCaptions.snippet.trackKind} caption track with ID: ${servingCaptions.id}`);
 
+  // Download the captions
   console.log('Downloading captions...');
   const captionData = await youtube.captions.download({
     id: servingCaptions.id,
@@ -55,14 +57,12 @@ async function main() {
   }, {responseType: 'text'});
   console.log(`✅ Captions downloaded successfully - length: ${captionData.data.length} characters`);
 
-  const formattedDate = dayjs(broadcast.snippet.publishedAt).format('DD/MM/YYYY');
-  const newTitle = `Sunday Morning Worship - ${formattedDate}`;
-  console.log('New title:', newTitle);
-
   const transcription = captionData.data.replace(/^\d+$/gm, '').replace(/\n\n/g, '\n').trim();
   //console.log(transcription);
+  
   const client = new OpenAI();
 
+  // Generate chapter markers using OpenAI API
   console.log('Generating chapter markers using AI...');
   const response = await client.responses.create({
     model: "gpt-5.2",
@@ -71,9 +71,14 @@ async function main() {
   console.log('✅ Chapter markers generated successfully:');
   console.log(response.output_text);
 
+  // Generate title and description
+  const formattedDate = dayjs(broadcast.snippet.publishedAt).format('DD/MM/YYYY');
+  const newTitle = `Sunday Morning Worship - ${formattedDate}`;
+  console.log('New title:', newTitle);
   const newDescription = `Welcome to our Sunday Morning worship service on ${formattedDate}.\n\n${response.output_text}\n\nPlease note: The timestamp descriptions above are automatically generated and may not always be accurate.`
   console.log('New description:', newDescription);
 
+  // Update video with new title and description
   console.log('Updating broadcast details on YouTube...');
   await youtube.liveBroadcasts.update({
     part: 'snippet',
@@ -88,6 +93,7 @@ async function main() {
   });
   console.log('✅ Broadcast updated successfully');
 
+  // Print a link to the video
   console.log('Check the video here: https://www.youtube.com/watch?v=' + broadcast.id);
 }
 
