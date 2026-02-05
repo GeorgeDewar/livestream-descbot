@@ -1,7 +1,12 @@
 name: Livestream Descbot (Scheduled)
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      extra_args:
+        required: false
+        type: string
+        description: "Additional arguments to pass to the script (e.g. --id=abc123 or --dry-run)"
   schedule:
     # GitHub cron is UTC. This runs every 10 minutes.
     - cron: "*/10 * * * *"
@@ -35,7 +40,7 @@ jobs:
           YOUTUBE_CLIENT_SECRET: ${{ secrets.YOUTUBE_CLIENT_SECRET }}
           YOUTUBE_REFRESH_TOKEN: ${{ secrets.YOUTUBE_REFRESH_TOKEN }}
         run: |
-          node index.js
+          node index.js ${{ github.event.inputs.extra_args }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
