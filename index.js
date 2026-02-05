@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import OpenAI from "openai";
 import dayjs from "dayjs";
 import timezone from "dayjs/plugin/timezone.js";
+import { writeFileSync } from "node:fs";
 
 import { youtube } from "./youtube.js";
 import { truncate } from "./util.js";
@@ -33,7 +34,6 @@ async function main() {
   console.log("Live broadcasts:");
   liveBroadcasts.data.items.forEach((item) => {
     console.log(`- ${item.id}: ${item.snippet.title} (status: ${item.status.lifeCycleStatus}, published: ${item.snippet.publishedAt})`);
-    console.log(item.snippet.description);
   });
 
   // If an ID is provided, only process that broadcast. Otherwise, process all broadcasts that match the criteria.
@@ -107,6 +107,8 @@ async function processBroadcast(broadcast) {
   console.log(
     `✅ Captions downloaded successfully - length: ${captionData.data.length} characters`,
   );
+  // Write the captions to a file for debugging
+  writeFileSync(`./tmp/${broadcast.id}.srt`, captionData.data, "utf8");
   if (options.showCaptions) {
     console.log("Captions:\n", captionData.data);
   }
@@ -118,11 +120,16 @@ async function processBroadcast(broadcast) {
 
   // Generate chapter markers using OpenAI API
   console.log("Generating chapter markers using AI...");
+  const input = prompt + transcription;
+  // Write the prompt to a file for debugging
+  writeFileSync(`./tmp/${broadcast.id}-prompt.txt`, input, "utf8");
   const response = await client.responses.create({
     model: "gpt-5.2",
-    input: prompt + transcription,
+    input,
   });
   console.log(`✅ Chapter markers generated successfully - output length: ${response.output_text.length} characters`);
+  // Write the chapter markers to a file for debugging
+  writeFileSync(`./tmp/${broadcast.id}-chapters.txt`, response.output_text, "utf8");
 
   // Generate title and description
   const formattedDate = dayjs(broadcast.snippet.publishedAt).format("DD/MM/YYYY");
@@ -146,12 +153,12 @@ async function processBroadcast(broadcast) {
       },
     });
     console.log("✅ Broadcast updated successfully");
+
+    // Print a link to the video
+    console.log("Check the video here: https://www.youtube.com/watch?v=" + broadcast.id);
   } else {
     console.log("☑️ Dry run enabled - not updating broadcast on YouTube");
   }
-
-  // Print a link to the video
-  console.log("Check the video here: https://www.youtube.com/watch?v=" + broadcast.id);
 }
 
 main();

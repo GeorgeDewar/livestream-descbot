@@ -1,23 +1,23 @@
 export const prompt = `
 Please produce chapter markers for a church service based on this transcript. Here is an example of the sort of chapter markers I would like:
 
-- 0:00:00 Start of recording
-- 0:01:00 Introduction & call to worship
-- 0:02:00 Song: Amazing Grace
-- 0:03:00 Children's talk & song
-- 0:04:00 Song: Behold Our God
-- 0:05:00 Song: Let Your Kingdom Come
-- 0:08:00 Offering & Prayer
-- 0:09:00 Notices
-- 0:10:00 Old Testament Reading: Isaiah 50
-- 0:11:00 Prayer
-- 0:12:00 Song: How Deep the Father's Love
-- 0:13:00 New Testament Reading: Philippians 2
-- 0:14:00 Sermon
-- 0:42:00 Closing prayer
-- 0:43:00 Song: Great is Thy Faithfulness
-- 0:44:00 Benediction song: May the Peace
-- 0:45:00 End of service
+0:00:00 Start of recording
+0:01:00 Introduction & call to worship
+0:02:00 Song: Amazing Grace
+0:03:00 Children's talk & song
+0:04:00 Song: Behold Our God
+0:05:00 Song: Let Your Kingdom Come
+0:08:00 Offering & Prayer
+0:09:00 Notices
+0:10:00 Old Testament Reading: Isaiah 50
+0:11:00 Prayer
+0:12:00 Song: How Deep the Father's Love
+0:13:00 New Testament Reading: Philippians 2
+0:14:00 Sermon
+0:42:00 Closing prayer
+0:43:00 Song: Great is Thy Faithfulness
+0:44:00 Benediction song: May the Peace
+0:45:00 End of service
 
 The above is just an example, though. Please ensure the timestamps are accurate to the second and correspond to the content of the transcript provided. The transcript is from YouTube's automatic speech recognition, so there may be some inaccuracies. If something seems likely incorrect, ignore it.
 
