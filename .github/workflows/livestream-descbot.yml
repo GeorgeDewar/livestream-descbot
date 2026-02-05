@@ -1,6 +1,7 @@
 name: Livestream Descbot (Scheduled)
 
 on:
+  workflow_dispatch: {}
   schedule:
     # GitHub cron is UTC. This runs every 10 minutes.
     - cron: "*/10 * * * *"
