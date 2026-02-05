@@ -5,23 +5,17 @@ import timezone from "dayjs/plugin/timezone.js";
 import { writeFileSync } from "node:fs";
 
 import { youtube } from "./youtube.js";
-import { truncate } from "./util.js";
+import { checkEnv, truncate } from "./util.js";
 import { prompt } from "./content.js";
 
 dotenv.config();
 dayjs.extend(timezone);
 dayjs.tz.setDefault("Pacific/Auckland");
 console.log(`Current time is ${dayjs().format("DD/MM/YYYY HH:mm:ss Z")}\n`);
-if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY environment variable is not set");
-} else {
-  console.log("✅ OpenAI API key is set (length: " + process.env.OPENAI_API_KEY.length + " characters)");
-}
-if (!process.env.YOUTUBE_REFRESH_TOKEN) {
-  throw new Error("YOUTUBE_REFRESH_TOKEN environment variable is not set");
-} else {
-  console.log("✅ YouTube refresh token is set (length: " + process.env.YOUTUBE_REFRESH_TOKEN.length + " characters)");
-}
+checkEnv("OPENAI_API_KEY");
+checkEnv("YOUTUBE_CLIENT_ID");
+checkEnv("YOUTUBE_CLIENT_SECRET");
+checkEnv("YOUTUBE_REFRESH_TOKEN");
 
 // If the video has this exact title, and the description ends with this, we can assume it hasn't been processed yet.
 const DEFAULT_TITLE = "Sunday Morning Worship";

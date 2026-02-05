@@ -4,3 +4,10 @@ export function truncate(input, length) {
   }
   return input;
 }
+
+export function checkEnv(variableName) {
+  if (!process.env[variableName]) {
+    throw new Error(`Required environment variable ${variableName} is not set`);
+  }
+  return process.env[variableName];
+}
