@@ -1,19 +1,19 @@
-import dotenv from 'dotenv';
-import {google} from 'googleapis';
+import dotenv from "dotenv";
+import { google } from "googleapis";
 
 dotenv.config();
 
 const oauth2Client = new google.auth.OAuth2(
   process.env.YOUTUBE_CLIENT_ID,
   process.env.YOUTUBE_CLIENT_SECRET,
-  process.env.YOUTUBE_REDIRECT_URL
+  process.env.YOUTUBE_REDIRECT_URL,
 );
 
 oauth2Client.setCredentials({
-  refresh_token: process.env.YOUTUBE_REFRESH_TOKEN
+  refresh_token: process.env.YOUTUBE_REFRESH_TOKEN,
 });
 
 export const youtube = google.youtube({
-    version: 'v3',
-    auth: oauth2Client
+  version: "v3",
+  auth: oauth2Client,
 });

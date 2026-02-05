@@ -27,6 +27,7 @@ Observe these guidelines:
 3. Do not provide commentry such as (title unclear) or (starts "my hope rests").
 4. Do not provide content summary such as "Prayer / confession (opening prayer: holiness, forgiveness)", just provide a broad label such as "Prayer", "Closing prayer".
 5. Ensure that the "Introduction & call to worship" and "End of service" labels are present exactly as shown, as these will be used later to trim the video. "Introduction & call to worship" must be a second or two before the pastor starts speaking, and "End of service" must be a few seconds after the benediction song ends.
+6. It is better for the timestamp of a song to be earlier than the actual start of the song than later. Don't wait for the first line of the song, if there are words indicating a song is starting, such as [music] or "let's sing" then this is the best time to start the timestamp for the song, even if the first line of the song is many seconds later.
 
 Here is the transcript, in SRT format with the sequence numbers removed:
 `;
