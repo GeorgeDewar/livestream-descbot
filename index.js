@@ -93,7 +93,8 @@ async function processBroadcast(broadcast) {
   const servingCaptions = captions.data.items.find((item) => item.snippet.status === "serving");
   if (!servingCaptions) {
     console.debug(captions.data.items);
-    throw new Error("No captions found for this broadcast");
+    console.warn(`⚠️ No captions found for broadcast ${broadcast.id}, skipping...`);
+    return;
   }
   console.log(
     `✅ Found ${servingCaptions.snippet.trackKind} caption track with ID: ${servingCaptions.id}`,
