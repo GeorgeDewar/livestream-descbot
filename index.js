@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import OpenAI from "openai";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
 import { writeFileSync } from "node:fs";
 
@@ -9,13 +10,16 @@ import { checkEnv, truncate } from "./util.js";
 import { prompt } from "./content.js";
 
 dotenv.config();
+dayjs.extend(utc);
 dayjs.extend(timezone);
-dayjs.tz.setDefault("Pacific/Auckland");
-console.log(`Current time is ${dayjs().format("DD/MM/YYYY HH:mm:ss Z")}\n`);
+
 checkEnv("OPENAI_API_KEY");
 checkEnv("YOUTUBE_CLIENT_ID");
 checkEnv("YOUTUBE_CLIENT_SECRET");
 checkEnv("YOUTUBE_REFRESH_TOKEN");
+
+const TIMEZONE = "Pacific/Auckland";
+console.log(`Current time is ${dayjs().tz(TIMEZONE).format("DD/MM/YYYY HH:mm:ss Z")}\n`);
 
 // If the video has this exact title, and the description ends with this, we can assume it hasn't been processed yet.
 const DEFAULT_TITLE = "Sunday Morning Worship";
@@ -137,7 +141,7 @@ async function processBroadcast(broadcast) {
   writeFileSync(`./tmp/${broadcast.id}-chapters.txt`, response.output_text, "utf8");
 
   // Generate title and description
-  const formattedDate = dayjs(broadcast.snippet.publishedAt).format("DD/MM/YYYY");
+  const formattedDate = dayjs(broadcast.snippet.publishedAt).tz(TIMEZONE).format("DD/MM/YYYY");
   const newTitle = `Sunday Morning Worship - ${formattedDate}`;
   console.log("New title:", newTitle);
   const newDescription = `Welcome to our Sunday Morning worship service on ${formattedDate}.\n\n${response.output_text}\n\nPlease note: The timestamp descriptions above are automatically generated and may not always be accurate.`;
