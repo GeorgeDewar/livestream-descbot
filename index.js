@@ -30,6 +30,7 @@ const options = {
   showCaptions: userArgs.includes("--show-captions"),
   dryRun: userArgs.includes("--dry-run"),
   id: userArgs.find((arg) => arg.startsWith("--id="))?.split("=")[1],
+  debug: userArgs.includes("--debug"),
 }
 
 async function main() {
@@ -134,9 +135,24 @@ async function processBroadcast(broadcast) {
   writeFileSync(`./tmp/${broadcast.id}-prompt.txt`, input, "utf8");
   const response = await client.responses.create({
     model: "gpt-5.2",
+    tools: [
+      { type: "web_search" },
+    ],
     input,
+    include: ["web_search_call.action.sources"],
   });
   console.log(`✅ Chapter markers generated successfully - output length: ${response.output_text.length} characters`);
+  if (options.debug) {
+    console.log("AI response:\n", response);
+  }
+  for (const outputItem of response.output) {
+    if (outputItem.type === "web_search_call") {
+      console.log("Searched the web for:");
+      for (const query of outputItem.action.queries) {
+        console.log(`- ${query}`);
+      }
+    }
+  }
   // Write the chapter markers to a file for debugging
   writeFileSync(`./tmp/${broadcast.id}-chapters.txt`, response.output_text, "utf8");
 
