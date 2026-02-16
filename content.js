@@ -21,24 +21,104 @@ In a normal service, only use the following headings, adding song and reading na
 
 In a service with communion, the communion proceedings should all be under the single heading "Communion".
 
-Here is an example, with example timestamps and song and reading names, showing the expected format:
+The output format should be a JSON array matching the schema:
 
-0:01:00 Introduction & call to worship
-0:02:00 Song: Amazing Grace
-0:03:00 Children's talk & song
-0:04:00 Song: Behold Our God
-0:05:00 Song: Let Your Kingdom Come
-0:08:00 Offering & Prayer
-0:09:00 Notices
-0:10:00 Old Testament Reading: Isaiah 50
-0:11:00 Prayer
-0:12:00 Song: How Deep the Father's Love
-0:13:00 New Testament Reading: Philippians 2
-0:14:00 Sermon
-0:42:00 Closing prayer
-0:43:00 Song: Great is Thy Faithfulness
-0:44:00 Benediction song: May the Peace
-0:45:00 End of service
+{
+    timestamp: string, // (in the format "H:MM:SS")
+    heading: string,
+    songName?: string, // (only for songs, the name of the song if it can be identified)
+    songNameConfidence?: number, // (only for songs (but required for songs), a confidence out of 100 for how likely the identified song name is correct, based on the transcript and web search results)
+    notes?: string, // (optional, additional notes about your reasoning, not displayed to the user, only for debugging)
+    summary?: string, // (optional, a brief summary of the content, only applicable to spoken sections, must be less than 100 words)
+}
+
+Here is an example, with example timestamps and song and reading names, showing the expected JSON format:
+
+[
+    {
+        "timestamp": "0:01:00",
+        "heading": "Introduction & call to worship"
+    },
+    {
+        "timestamp": "0:02:00",
+        "heading": "Song",
+        "songName": "Amazing Grace",
+        "songNameConfidence": 88,
+        "notes": "Identified from the transcript saying 'let's sing Amazing Grace'"
+    },
+    {
+        "timestamp": "0:03:00",
+        "heading": "Children's talk & song"
+    },
+    {
+        "timestamp": "0:04:00",
+        "heading": "Song",
+        "songName": "Behold Our God",
+        "songNameConfidence": 85,
+        "notes": "Identified from the lyrics in the transcript, which match the song 'Behold Our God'"
+    },
+    {
+        "timestamp": "0:05:00",
+        "heading": "Song",
+        "songName": "Let Your Kingdom Come",
+        "songNameConfidence": 73,
+        "notes": "Identified by searching the web for the lyrics 'let your kingdom come let your will be done' which are in the transcript and match the song 'Let Your Kingdom Come'"
+    },
+    {
+        "timestamp": "0:08:00",
+        "heading": "Offering & Prayer"
+    },
+    {
+        "timestamp": "0:09:00",
+        "heading": "Notices",
+        "summary": "Church camp is this weekend, and lunch is at the Wignalls after the service today" // (example summary of the notices, must be less than 100 words)
+    },
+    {
+        "timestamp": "0:10:00",
+        "heading": "Old Testament Reading: Isaiah 50",
+        "notes": "Identified from the transcript saying 'our Old Testament reading today is from Isaiah chapter 50'"
+    },
+    {
+        "timestamp": "0:11:00",
+        "heading": "Prayer"
+    },
+    {
+        "timestamp": "0:12:00",
+        "heading": "Song",
+        "songName": "How Deep the Father's Love",
+        "songNameConfidence": 90,
+        "notes": "Identified from the lyrics in the transcript, which match the song 'How Deep the Father's Love'"
+    },
+    {
+        "timestamp": "0:13:00",
+        "heading": "New Testament Reading: Philippians 2",
+        "notes": "Identified from the transcript saying 'our New Testament reading is from Philippians chapter 2'"
+    },
+    {
+        "timestamp": "0:14:00",
+        "heading": "Sermon"
+    },
+    {
+        "timestamp": "0:42:00",
+        "heading": "Closing prayer"
+    },
+    {
+        "timestamp": "0:43:00",
+        "heading": "Song",
+        "songName": "Great is Thy Faithfulness",
+        "songNameConfidence": 80,
+        "notes": "Identified from the lyrics in the transcript"
+    },
+    {
+        "timestamp": "0:44:00",
+        "heading": "Benediction song",
+        "notes": "Unable to identify the name of the song, even after searching the web for the lyrics"
+    },
+    {
+        "timestamp": "0:45:00",
+        "heading": "End of service"
+    }
+]
 
 The above is just an example, though. Please ensure the timestamps are accurate to the second and correspond to the content of the transcript provided. The transcript is from YouTube's automatic speech recognition, so there may be some inaccuracies. If something seems likely incorrect, ignore it.
 
@@ -59,7 +139,7 @@ Other guidelines:
 - Do not provide content summary such as "Prayer / confession (opening prayer: holiness, forgiveness)", just provide a broad label such as "Prayer", "Closing prayer".
 - Ensure that the "Introduction & call to worship" and "End of service" labels are present exactly as shown, as these will be used later to trim the video. "Introduction & call to worship" must be a second or two before the pastor starts speaking, and "End of service" must be a few seconds after the benediction song ends.
 - It is better for the timestamp of a song to be earlier than the actual start of the song than later. Don't wait for the first line of the song, if there are words indicating a song is starting, such as [music] or "let's sing" then this is the best time to start the timestamp for the song, even if the first line of the song is many seconds later.
-- The overall output must consist of absolutely nothing other than the chapter markers in the format shown in the example.
+- Output only the JSON array with nothing else, not even backticks, so it can be parsed.
 
 Additional song list (songs that may be difficult or impossible to find via a web search), with name followed by some lyrics:
 - Bless the Lord O My Soul (Psalm 103) - not to be confused with 10,000 Reasons which also contains "Bless the Lord O My Soul"
