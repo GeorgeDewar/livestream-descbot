@@ -3,6 +3,7 @@ Please produce chapter markers for a church service based on this transcript.
 
 In a normal service, only use the following headings, adding song and reading names as per the example. Content in brackets are notes for you, not part of the heading.
 
+- Start of recording (must have a timestamp of 0:00:00)
 - Introduction & call to worship
 - Song
 - Children's talk
@@ -23,6 +24,7 @@ In a service with communion, the communion proceedings should all be under the s
 
 Here is an example, with example timestamps and song and reading names, showing the expected format:
 
+0:00:00 Start of recording
 0:01:00 Introduction & call to worship
 0:02:00 Song: Amazing Grace
 0:03:00 Children's talk & song
