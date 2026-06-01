@@ -31,7 +31,7 @@ const options = {
   dryRun: userArgs.includes("--dry-run"),
   id: userArgs.find((arg) => arg.startsWith("--id="))?.split("=")[1],
   debug: userArgs.includes("--debug"),
-}
+};
 
 async function main() {
   // Get live broadcasts
@@ -42,7 +42,9 @@ async function main() {
 
   console.log("Live broadcasts:");
   liveBroadcasts.data.items.forEach((item) => {
-    console.log(`- ${item.id}: ${item.snippet.title} (status: ${item.status.lifeCycleStatus}, published: ${item.snippet.publishedAt})`);
+    console.log(
+      `- ${item.id}: ${item.snippet.title} (status: ${item.status.lifeCycleStatus}, published: ${item.snippet.publishedAt})`,
+    );
   });
 
   // If an ID is provided, only process that broadcast. Otherwise, process all broadcasts that match the criteria.
@@ -101,9 +103,7 @@ async function processBroadcast(broadcast) {
     console.warn(`⚠️ No captions found for broadcast ${broadcast.id}, skipping...`);
     return;
   }
-  console.log(
-    `✅ Found ${servingCaptions.snippet.trackKind} caption track with ID: ${servingCaptions.id}`,
-  );
+  console.log(`✅ Found ${servingCaptions.snippet.trackKind} caption track with ID: ${servingCaptions.id}`);
 
   // Download the captions
   console.log("Downloading captions...");
@@ -114,9 +114,7 @@ async function processBroadcast(broadcast) {
     },
     { responseType: "text" },
   );
-  console.log(
-    `✅ Captions downloaded successfully - length: ${captionData.data.length} characters`,
-  );
+  console.log(`✅ Captions downloaded successfully - length: ${captionData.data.length} characters`);
   // Write the captions to a file for debugging
   writeFileSync(`./tmp/${broadcast.id}.srt`, captionData.data, "utf8");
   if (options.showCaptions) {
@@ -134,10 +132,8 @@ async function processBroadcast(broadcast) {
   // Write the prompt to a file for debugging
   writeFileSync(`./tmp/${broadcast.id}-prompt.txt`, input, "utf8");
   const response = await client.responses.create({
-    model: "gpt-5.2",
-    tools: [
-      { type: "web_search" },
-    ],
+    model: "gpt-5.4",
+    tools: [{ type: "web_search" }],
     input,
     include: ["web_search_call.action.sources"],
   });
@@ -167,7 +163,7 @@ async function processBroadcast(broadcast) {
     // Update video with new title and description
     console.log("Updating broadcast details on YouTube...");
     await youtube.liveBroadcasts.update({
-      part: "snippet",
+      part: "snippet,status",
       requestBody: {
         id: broadcast.id,
         snippet: {
@@ -176,6 +172,7 @@ async function processBroadcast(broadcast) {
           description: newDescription,
         },
         status: {
+          ...broadcast.status,
           selfDeclaredMadeForKids: false,
         },
       },

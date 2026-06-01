@@ -18,7 +18,7 @@ In a normal service, only use the following headings, adding song and reading na
 - Closing prayer
 - Benediction
 - Benediction song
-- End of service
+- End of service (only include if the transcript continues more than 1 minute after the benediction song ends, so we can use this to trim the video)
 
 In a service with communion, the communion proceedings should all be under the single heading "Communion".
 
