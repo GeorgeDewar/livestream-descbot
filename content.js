@@ -62,6 +62,7 @@ Other guidelines:
 - Ensure that the "Introduction & call to worship" and "End of service" labels are present exactly as shown, as these will be used later to trim the video. "Introduction & call to worship" must be a second or two before the pastor starts speaking, and "End of service" must be a few seconds after the benediction song ends.
 - It is better for the timestamp of a song to be earlier than the actual start of the song than later. Don't wait for the first line of the song, if there are words indicating a song is starting, such as [music] or "let's sing" then this is the best time to start the timestamp for the song, even if the first line of the song is many seconds later.
 - The overall output must consist of absolutely nothing other than the chapter markers in the format shown in the example.
+- Chapters must be at least 10 seconds apart. If two sections are less than 10 seconds apart you must combine them.
 
 Additional song list (songs that may be difficult or impossible to find via a web search), with name followed by some lyrics:
 - Bless the Lord O My Soul (Psalm 103) - not to be confused with 10,000 Reasons which also contains "Bless the Lord O My Soul"

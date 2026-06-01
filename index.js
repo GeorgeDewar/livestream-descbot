@@ -1,13 +1,13 @@
-import dotenv from "dotenv";
-import OpenAI from "openai";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+import utc from "dayjs/plugin/utc.js";
+import dotenv from "dotenv";
 import { writeFileSync } from "node:fs";
+import OpenAI from "openai";
 
-import { youtube } from "./youtube.js";
-import { checkEnv, truncate } from "./util.js";
 import { prompt } from "./content.js";
+import { checkEnv, truncate } from "./util.js";
+import { youtube } from "./youtube.js";
 
 dotenv.config();
 dayjs.extend(utc);
@@ -174,6 +174,9 @@ async function processBroadcast(broadcast) {
           ...broadcast.snippet,
           title: newTitle,
           description: newDescription,
+        },
+        status: {
+          selfDeclaredMadeForKids: false,
         },
       },
     });
