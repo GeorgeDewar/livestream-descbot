@@ -24,24 +24,54 @@ console.log(`Current time is ${dayjs().tz(TIMEZONE).format("DD/MM/YYYY HH:mm:ss 
 // If the video has this exact title, and the description ends with this, we can assume it hasn't been processed yet.
 const DEFAULT_TITLE = "Sunday Morning Worship";
 const DEFAULT_DESCRIPTION_END = "Welcome to worship this morning.";
+const DEFAULT_MAX_VIDEOS = 5;
 
 const userArgs = process.argv.slice(2);
+const maxVideosArg = userArgs.find((arg) => arg.startsWith("--max-videos="))?.split("=")[1];
+const maxVideos = maxVideosArg ? Number.parseInt(maxVideosArg, 10) : DEFAULT_MAX_VIDEOS;
+
+if (!Number.isInteger(maxVideos) || maxVideos < 1) {
+  throw new Error("--max-videos must be a positive integer");
+}
+
 const options = {
   showCaptions: userArgs.includes("--show-captions"),
   dryRun: userArgs.includes("--dry-run"),
   id: userArgs.find((arg) => arg.startsWith("--id="))?.split("=")[1],
   debug: userArgs.includes("--debug"),
+  maxVideos,
 };
 
-async function main() {
-  // Get live broadcasts
-  const liveBroadcasts = await youtube.liveBroadcasts.list({
-    part: "snippet,contentDetails,status",
-    mine: true,
-  });
+async function getAllLiveBroadcasts(limit) {
+  const broadcasts = [];
+  let pageToken;
 
-  console.log("Live broadcasts:");
-  liveBroadcasts.data.items.forEach((item) => {
+  do {
+    const response = await youtube.liveBroadcasts.list({
+      part: "snippet,contentDetails,status",
+      mine: true,
+      maxResults: Math.min(50, limit),
+      pageToken,
+    });
+
+    for (const item of response.data.items) {
+      if (broadcasts.length < limit) {
+        broadcasts.push(item);
+      } else {
+        break;
+      }
+    }
+    pageToken = response.data.nextPageToken;
+  } while (pageToken && broadcasts.length < limit);
+
+  return broadcasts;
+}
+
+async function main() {
+  const liveBroadcasts = await getAllLiveBroadcasts(options.maxVideos);
+
+  console.log(`Live broadcasts (${liveBroadcasts.length}):`);
+  liveBroadcasts.forEach((item) => {
     console.log(
       `- ${item.id}: ${item.snippet.title} (status: ${item.status.lifeCycleStatus}, published: ${item.snippet.publishedAt})`,
     );
@@ -49,7 +79,7 @@ async function main() {
 
   // If an ID is provided, only process that broadcast. Otherwise, process all broadcasts that match the criteria.
   if (options.id) {
-    const broadcast = liveBroadcasts.data.items.find((item) => item.id === options.id);
+    const broadcast = liveBroadcasts.find((item) => item.id === options.id);
     if (!broadcast) {
       console.error(`No broadcast found with ID: ${options.id}`);
       return;
@@ -60,13 +90,15 @@ async function main() {
   }
 
   // Loop through broadcasts and process those that match the criteria (i.e. haven't been processed already and are ready)
-  for (const item of liveBroadcasts.data.items) {
+  for (const item of liveBroadcasts) {
     if (item.snippet.title !== DEFAULT_TITLE) {
       console.log(`Skipping broadcast ${item.id} - title has already been changed`);
+      console.log(item.snippet.title);
       continue;
     }
     if (!item.snippet.description.trim().endsWith(DEFAULT_DESCRIPTION_END)) {
       console.log(`Skipping broadcast ${item.id} - description has been changed`);
+      console.log(item.snippet.description.trim());
       continue;
     }
     if (item.status.lifeCycleStatus !== "complete") {

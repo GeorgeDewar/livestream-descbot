@@ -21,6 +21,10 @@ It should print a refresh token to the console. Copy this to .env.
 
 Note that it will only get the refresh token the FIRST time you authorize the app, so if you fail to store it that time, you have to revoke the access and then try again. Since this is inconvenient, save it somewhere safe like your password manager.
 
+Run `node index.js` to process up to 5 matching videos.
+
+Use `--max-videos=<number>` to change that limit when working through older broadcasts, for example `node index.js --max-videos=50`.
+
 ## Running in the CI
 
 This is set up to run on GitHub actions periodically. The variables in .env need to be set up as secrets in Actions.
